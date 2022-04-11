@@ -14,17 +14,32 @@ class Player(pygame.sprite.Sprite):
         self.score = 0
         self.state = False
         self.speed = speed
+        self.prev_dir = 0
 
-    def moves(self):
+    def rotation(self, direction):
+        angle = direction - self.prev_dir
+        self.image = pygame.transform.rotate(self.image, angle)
+        self.prev_dir = direction
+
+    def moves(self, borders):
+
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RIGHT]:
-            self.pacman.x += self.speed
+            if self.check_col(borders, self.speed, 0):
+                self.pacman.x += self.speed
+            self.rotation(0)
         if keys[pygame.K_DOWN]:
-            self.pacman.y += self.speed
+            if self.check_col(borders, 0, self.speed):
+                self.pacman.y += self.speed
+            self.rotation(270)
         if keys[pygame.K_UP]:
-            self.pacman.y -= self.speed
+            if self.check_col(borders, 0, -self.speed):
+                self.pacman.y -= self.speed
+            self.rotation(90)
         if keys[pygame.K_LEFT]:
-            self.pacman.x -= self.speed
+            if self.check_col(borders, -self.speed, 0):
+                self.pacman.x -= self.speed
+            self.rotation(180)
 
         if self.pacman.x > WIDTH:
             self.pacman.x = 0
@@ -34,3 +49,9 @@ class Player(pygame.sprite.Sprite):
             self.pacman.y = HEIGHT - 46
         elif self.pacman.y < 16:
             self.pacman.y = 16
+
+    def check_col(self, borders, speed_x, speed_y):
+        for border in borders:
+            if (self.pacman.x + speed_x + self.image.get_width() > border.x and border.x + border.width > self.pacman.x + speed_x) and (self.pacman.y + speed_y + self.image.get_height() > border.y and border.y + border.height > self.pacman.y + speed_y):
+                return False
+        return True
