@@ -45,10 +45,10 @@ class Player(pygame.sprite.Sprite):
             self.pacman.x = 0
         elif self.pacman.x < 0:
             self.pacman.x = WIDTH
-        if self.pacman.y > HEIGHT - 46:
-            self.pacman.y = HEIGHT - 46
-        elif self.pacman.y < 16:
-            self.pacman.y = 16
+        if self.pacman.y > HEIGHT - 50:
+            self.pacman.y = HEIGHT - 50
+        elif self.pacman.y < 24:
+            self.pacman.y = 24
 
     def check_col(self, borders, speed_x, speed_y):
         for border in borders:
