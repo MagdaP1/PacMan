@@ -55,3 +55,8 @@ class Player(pygame.sprite.Sprite):
             if (self.pacman.x + speed_x + self.image.get_width() > border.x and border.x + border.width > self.pacman.x + speed_x) and (self.pacman.y + speed_y + self.image.get_height() > border.y and border.y + border.height > self.pacman.y + speed_y):
                 return False
         return True
+
+    def increase_score(self, points):
+        self.score += points
+        print(self.score)
+
