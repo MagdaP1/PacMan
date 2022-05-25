@@ -6,19 +6,22 @@ from Borders import Borders
 from Points import Points
 from Ghost import Ghost
 
+
 def main():
+    clock = pygame.time.Clock()
+    dt = clock.tick(60)
+
     pygame.init()
     resolution = (WIDTH, HEIGHT)
     screen = pygame.display.set_mode(resolution)
     bg = pygame.image.load("textures/background.png")
+    backg = pygame.image.load("textures/gameover.jpg")
+    backg = pygame.transform.scale(backg, (WIDTH, HEIGHT))
     bg = pygame.transform.scale(bg, (WIDTH, HEIGHT))
-    pacman = Player(5, (20, 20))
-    red_ghost = Ghost(3, (303, 320), "textures/ghost1.png", "red")
-    blue_ghost = Ghost(4, (910, 320), "textures/ghost2.png", "red")
-    pink_ghost = Ghost(2, (980, 320), "textures/ghost3.png", "red")
+    pacman = Player(0.6, (20, 20))
     borders = [
         Borders(61, 24, 235, 285),
-        Borders(61, 24, 875, 285),
+        Borders(150, 24, 875, 285),
         Borders(61, 24, 345, 285),
         Borders(61, 24, 985, 285),
         Borders(24, 103, 235, 285),
@@ -435,7 +438,6 @@ def main():
         Points((920, 81)),
         Points((920, 104)),
         Points((920, 127)),
-
         Points((60, 35)),
         Points((30, 58)),
         Points((30, 81)),
@@ -758,7 +760,9 @@ def main():
         Points((280, 127)),
 
     ]
-
+    ghosts = [Ghost(0.5, (303, 320), "textures/ghost1.png", "red"), Ghost(6, (910, 320), "textures/ghost2.png", "blue"),
+              Ghost(5, (980, 320), "textures/ghost3.png", "pink")]
+    final_score = 0
     while True:
         # obsluga zdarzen
         for event in pygame.event.get():
@@ -767,16 +771,12 @@ def main():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 sys.exit(0)
 
-        pacman.moves(borders)
-
+        pacman.moves(borders, dt)
 
         screen.fill((0, 0, 0))
         screen.blit(bg, (0, 0))
 
         screen.blit(pacman.image, pacman.pacman)
-        screen.blit(red_ghost.image, red_ghost.ghost)
-        screen.blit(blue_ghost.image, blue_ghost.ghost)
-        screen.blit(pink_ghost.image, pink_ghost.ghost)
 
         for border in borders:
             pygame.draw.rect(screen, (9, 9, 123), border.border)
@@ -784,15 +784,28 @@ def main():
             score = point.moves(pacman)
             if score > 0:
                 points.remove(point)
-                pacman.increase_score(score)
+                final_score = pacman.increase_score(score)
             screen.blit(point.image, point.point)
+        for x in ghosts:
+            screen.blit(x.image, x.ghost)
+            x.moves(borders, [pacman.pacman.x, pacman.pacman.y], dt)
+        pacman.print_lives(screen)
         write_text(f'Score: {pacman.score}', 80, 10, 30, screen)
-        red_ghost.moves(borders, [pacman.pacman.x, pacman.pacman.y])
-        blue_ghost.moves(borders, [pacman.pacman.x, pacman.pacman.y])
-        pink_ghost.moves(borders, [pacman.pacman.x, pacman.pacman.y])
+
+        if pacman.ghosts_interaction(ghosts) <= 0 or final_score == 6430:
+            break
 
         pygame.display.flip()
-
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit(0)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                sys.exit(0)
+        screen.fill((0, 0, 0))
+        screen.blit(backg, (0, 0))
+        write_text(f'Score: {pacman.score}', 600, 200, 90, screen)
+        pygame.display.flip()
 
 def write_text(string, coordx, coordy, fontSize, screen):
     font = pygame.font.Font('textures/BarlowCondensed-Black.ttf', fontSize)

@@ -21,18 +21,18 @@ class Ghost(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.image, angle)
         self.prev_dir = direction
 
-    def chasing_red(self, borders, player_cords):
-        speeds = [[0, - self.speed], [- self.speed, 0], [0, self.speed],  [self.speed, 0]]
+    def chasing_red(self, borders, player_cords, dt):
+        speeds = [[0, - self.speed*dt], [- self.speed*dt, 0], [0, self.speed*dt],  [self.speed*dt, 0]]
         directions = []
         if (not self.prev_move == speeds[0]) and self.check_col(borders, speeds[0]):
             x = player_cords[0] - self.ghost.x
-            y = player_cords[1] - (self.ghost.y - self.speed)
+            y = player_cords[1] - (self.ghost.y - self.speed*dt)
             dst = x**2 + y**2
             directions.append(dst)
         else:
             directions.append(inf)
         if (not self.prev_move == speeds[1]) and self.check_col(borders, speeds[1]):
-            x = player_cords[0] - (self.ghost.x - self.speed)
+            x = player_cords[0] - (self.ghost.x - self.speed*dt)
             y = player_cords[1] - self.ghost.y
             dst = x ** 2 + y ** 2
             directions.append(dst)
@@ -40,13 +40,13 @@ class Ghost(pygame.sprite.Sprite):
             directions.append(inf)
         if (not self.prev_move == speeds[2]) and self.check_col(borders, speeds[2]):
             x = player_cords[0] - self.ghost.x
-            y = player_cords[1] - (self.ghost.y + self.speed)
+            y = player_cords[1] - (self.ghost.y + self.speed*dt)
             dst = x ** 2 + y ** 2
             directions.append(dst)
         else:
             directions.append(inf)
         if (not self.prev_move == speeds[3]) and self.check_col(borders, speeds[3]):
-            x = player_cords[0] - (self.ghost.x + self.speed)
+            x = player_cords[0] - (self.ghost.x + self.speed*dt)
             y = player_cords[1] - self.ghost.y
             dst = x ** 2 + y ** 2
             directions.append(dst)
@@ -60,11 +60,11 @@ class Ghost(pygame.sprite.Sprite):
         self.ghost.y += self.prev_move[1]
         self.prev_move = [- self.prev_move[0], - self.prev_move[1]]
 
-    def moves(self, borders, player_cords):
+    def moves(self, borders, player_cords, dt):
 
         if self.color == "red":
 
-            self.chasing_red(borders, player_cords)
+            self.chasing_red(borders, player_cords, dt)
 
     def check_col(self, borders, speeds):
         for border in borders:
