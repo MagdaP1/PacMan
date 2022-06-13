@@ -1,14 +1,17 @@
 import pygame
-from settings import HEIGHT, WIDTH
 
 
 class Points(pygame.sprite.Sprite):
     size = 8
 
-    def __init__(self, position):
+    def __init__(self, position, super_point=False):
         super().__init__()
+        self.super_point = super_point
         self.image = pygame.image.load("textures/point.png")
-        self.image = pygame.transform.scale(self.image, (Points.size, Points.size))
+        if super_point :
+            self.image = pygame.transform.scale(self.image, (15, 15))
+        else:
+            self.image = pygame.transform.scale(self.image, (Points.size, Points.size))
         self.point = self.image.get_rect()
         self.point.x, self.point.y = position
 
@@ -22,5 +25,7 @@ class Points(pygame.sprite.Sprite):
 
     def moves(self, player):
         if self.check_pos(player):
-            return 10
-        return 0
+            if self.super_point:
+                return 10, True
+            return 10, False
+        return 0, False

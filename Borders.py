@@ -1,5 +1,5 @@
 import pygame
-from settings import HEIGHT, WIDTH
+
 
 class Borders(pygame.sprite.Sprite):
     def __init__(self, size_x, size_y, x, y):

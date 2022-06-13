@@ -8,7 +8,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, speed, position):
         super().__init__()
         self.image = pygame.image.load("textures/pacman.png")
-        self.image = pygame.transform.scale(self.image, (30, 30))
+        self.image = pygame.transform.scale(self.image, (32, 32))
         self.pacman = self.image.get_rect()
         self.pacman.x, self.pacman.y = position
         self.score = 0
@@ -31,11 +31,21 @@ class Player(pygame.sprite.Sprite):
                 return True
         return False
 
+    def ghost_ghost(self, ghosts):
+        for ghost in ghosts:
+            if (self.pacman.x + self.image.get_width() > ghost.ghost.x and ghost.ghost.x + ghost.ghost.width > self.pacman.x ) and (self.pacman.y + self.image.get_height() > ghost.ghost.y and ghost.ghost.y + ghost.ghost.height > self.pacman.y):
+                return ghost
+
     def ghosts_interaction(self, ghosts):
-        if self.ghost_col(ghosts):
+        ghost = None
+        if self.ghost_col(ghosts) and not self.state:
             self.lives -= 1
             self.pacman.x, self.pacman.y = self.starting_position
-        return self.lives
+        elif self.ghost_col(ghosts):
+            self.score += 200
+            ghost = self.ghost_ghost(ghosts)
+
+        return self.lives, ghost
 
     def rotation(self, direction):
         angle = direction - self.prev_dir
@@ -46,20 +56,20 @@ class Player(pygame.sprite.Sprite):
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RIGHT]:
-            if self.check_col(borders, self.speed*dt, 0):
-                self.pacman.x += self.speed * dt
+            if self.check_col(borders, self.speed/dt, 0):
+                self.pacman.x += self.speed / dt
             self.rotation(0)
         if keys[pygame.K_DOWN]:
-            if self.check_col(borders, 0, self.speed*dt):
-                self.pacman.y += self.speed * dt
+            if self.check_col(borders, 0, self.speed/dt):
+                self.pacman.y += self.speed / dt
             self.rotation(270)
         if keys[pygame.K_UP]:
-            if self.check_col(borders, 0, -self.speed*dt):
-                self.pacman.y -= self.speed * dt
+            if self.check_col(borders, 0, -self.speed/dt):
+                self.pacman.y -= self.speed / dt
             self.rotation(90)
         if keys[pygame.K_LEFT]:
-            if self.check_col(borders, -self.speed *dt, 0):
-                self.pacman.x -= self.speed * dt
+            if self.check_col(borders, -self.speed/dt, 0):
+                self.pacman.x -= self.speed / dt
             self.rotation(180)
 
         if self.pacman.x > WIDTH:
@@ -80,4 +90,3 @@ class Player(pygame.sprite.Sprite):
     def increase_score(self, points):
         self.score += points
         return self.score
-
