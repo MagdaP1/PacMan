@@ -18,6 +18,7 @@ class Ghost(pygame.sprite.Sprite):
         self.prev_move = None
         self.state_move = False
         self.number_of_moves = 0
+        self.prev = None
 
     def rotation(self, direction):
         angle = direction - self.prev_dir
@@ -78,25 +79,16 @@ class Ghost(pygame.sprite.Sprite):
                 self.run(borders)
 
     def run(self, borders):
-        if self.number_of_moves == 0:
-            self.number_of_moves += 1
-            speeds = [[0, - self.speed / 2], [- self.speed / 2, 0], [0, self.speed / 2], [self.speed / 2, 0]]
+        speeds = [[0, - self.speed / 16], [- self.speed / 16, 0], [0, self.speed / 16], [self.speed / 16, 0]]
 
-            while True:
-                n = random.randint(0, 3)
-                if self.check_col(borders, speeds[n]) and (self.prev_move[0]*8 != speeds[n][0] or self.prev_move[1]*8 != speeds[n][1]):
-                    print(self.prev_move[0] * 8)
-                    print(speeds[n][0])
-                    self.ghost.x += speeds[n][0] / 8
-                    self.ghost.y += speeds[n][1] / 8
-                    break
-            self.prev_move = [speeds[n][0], speeds[n][1]]
-        else:
-            self.number_of_moves += 1
-            if self.number_of_moves == 8:
-                self.number_of_moves = 0
-            self.ghost.x += self.prev_move[0] / 8
-            self.ghost.y += self.prev_move[1] / 8
+        while True:
+            n = random.randint(0, 3)
+            if self.check_col(borders, speeds[n]) and self.prev != speeds[n]:
+                self.ghost.x += speeds[n][0]
+                self.ghost.y += speeds[n][1]
+                break
+        self.prev = [-speeds[n][0], -speeds[n][1]]
+        self.prev_move = speeds[n]
 
     def check_col(self, borders, speeds):
         for border in borders:
